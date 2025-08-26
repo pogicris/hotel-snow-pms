@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}Timeline - Hotel Snow PMS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .timeline-container {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 80vh;
+    }
+    
+    .timeline-grid {
+        display: grid;
+        grid-template-columns: 120px repeat(7, minmax(150px, 1fr));
+        gap: 1px;
+        background-color: #dee2e6;
+        border: 1px solid #dee2e6;
+        min-width: 1000px;
+    }
+    
+    .timeline-header, .timeline-cell {
+        background-color: white;
+        padding: 10px;
+        font-size: 0.875rem;
+    }
+    
+    .timeline-header {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        text-align: center;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    
+    .room-header {
+        background-color: #e9ecef;
+        font-weight: bold;
+        position: sticky;
+        left: 0;
+        z-index: 5;
+    }
+    
+    .booking-bar {
+        position: relative;
+        height: 30px;
+        border-radius: 4px;
+        color: white;
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        margin: 2px 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .booking-green { background-color: #28a745; }
+    .booking-yellow { background-color: #ffc107; color: #212529; }
+    .booking-red { background-color: #dc3545; }
+    .booking-violet { background-color: #6f42c1; }
+    .booking-gray { background-color: #6c757d; }
+    
+    .week-nav {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .legend {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .legend-color {
+        width: 20px;
+        height: 15px;
+        border-radius: 3px;
+    }
+    
+    @media (max-width: 768px) {
+        .timeline-container {
+            font-size: 0.75rem;
+        }
+        
+        .timeline-grid {
+            grid-template-columns: 100px repeat(7, minmax(120px, 1fr));
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>📅 Room Timeline</h2>
+            <div class="week-nav">
+                <a href="?start_date={{ prev_week|date:'Y-m-d' }}" class="btn btn-outline-primary">← Previous Week</a>
+                <span class="mx-3">{{ start_date|date:'M d' }} - {{ end_date|date:'M d, Y' }}</span>
+                <a href="?start_date={{ next_week|date:'Y-m-d' }}" class="btn btn-outline-primary">Next Week →</a>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color booking-green"></div>
+                <span>Fully Paid</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color booking-yellow"></div>
+                <span>Pencil Booked</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color booking-red"></div>
+                <span>No Show</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color booking-violet"></div>
+                <span>Partial Payment</span>
+            </div>
+        </div>
+        
+        <!-- Timeline Grid -->
+        <div class="timeline-container">
+            <div class="timeline-grid">
+                <!-- Header Row -->
+                <div class="timeline-header room-header">Room</div>
+                {% for date in date_range %}
+                <div class="timeline-header">
+                    {{ date|date:'D' }}<br>
+                    {{ date|date:'M j' }}
+                </div>
+                {% endfor %}
+                
+                <!-- Room Rows -->
+                {% for room_data in timeline_data %}
+                <div class="timeline-cell room-header">
+                    <strong>{{ room_data.room.room_number }}</strong><br>
+                    <small>{{ room_data.room.room_type.get_name_display }}</small>
+                </div>
+                
+                {% for date in date_range %}
+                <div class="timeline-cell">
+                    {% for booking in room_data.bookings %}
+                    {% if booking.check_in <= date and booking.check_out > date %}
+                    <div class="booking-bar booking-{{ booking.color }}"
+                         onclick="showBookingDetails({{ booking.id }})"
+                         title="{{ booking.guest_name }} ({{ booking.check_in|date:'M j' }} - {{ booking.check_out|date:'M j' }})">
+                        {% if booking.check_in == date %}
+                        {{ booking.guest_name|truncatechars:10 }}
+                        {% else %}
+                        <!---->
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Details Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Booking Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="bookingDetails">
+                Loading...
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showBookingDetails(bookingId) {
+    window.location.href = '/booking/' + bookingId + '/';
+}
+
+// Auto-refresh timeline every 5 minutes
+setTimeout(function() {
+    location.reload();
+}, 300000);
+</script>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}System Memos - Hotel Snow PMS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>📋 Create New Memo</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_popup" name="is_popup">
+                        <label class="form-check-label" for="is_popup">
+                            Show as popup on dashboard
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Create Memo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>📝 Active System Memos</h5>
+            </div>
+            <div class="card-body">
+                {% if memos %}
+                {% for memo in memos %}
+                <div class="card mb-3 {% if memo.is_popup %}border-warning{% endif %}">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">{{ memo.title }}</h6>
+                            <small class="text-muted">
+                                By {{ memo.created_by.username }} on {{ memo.created_at|date:'F d, Y g:i A' }}
+                            </small>
+                        </div>
+                        <div>
+                            {% if memo.is_popup %}
+                            <span class="badge bg-warning">Popup</span>
+                            {% endif %}
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>{{ memo.content|linebreaks }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center text-muted">
+                    <p>No active memos found.</p>
+                    <p>Create a new memo to communicate important information to users.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>💡 Memo Management Tips</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Popup Memos:</h6>
+                        <ul>
+                            <li>Show as alerts on the dashboard</li>
+                            <li>Use for urgent announcements</li>
+                            <li>Users can dismiss them</li>
+                            <li>Great for policy updates</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Regular Memos:</h6>
+                        <ul>
+                            <li>Listed in this memo management page</li>
+                            <li>Use for reference information</li>
+                            <li>Always visible to super users</li>
+                            <li>Good for procedures and guidelines</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <strong>Note:</strong> Only Super Users can create and manage system memos. 
+                    All memos are visible to Admin and Super users. Regular members cannot access this feature.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

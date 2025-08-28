@@ -1,0 +1,33 @@
+# Render.com configuration for Hotel PMS Rev9
+
+databases:
+  - name: hotel-pms-rev9-db
+    databaseName: hotel_pms_rev9
+    user: hotel_pms_user
+
+services:
+  - type: web
+    name: hotel-pms-rev9
+    runtime: python3
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn hotel_pms.wsgi:application"
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hotel-pms-rev9-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        value: hotel-pms-rev9.onrender.com
+      - key: PRODUCTION
+        value: True
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_EMAIL
+        value: admin@hotel-pms-rev9.com
+      - key: ADMIN_PASSWORD
+        generateValue: true

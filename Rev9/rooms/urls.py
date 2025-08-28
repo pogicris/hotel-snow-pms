@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-import debug_views
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),

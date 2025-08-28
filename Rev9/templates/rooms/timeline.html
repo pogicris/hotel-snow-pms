@@ -82,11 +82,11 @@
                             <!-- Check if any booking starts on this date -->
                             {% for booking in room_data.bookings %}
                                 {% if booking.check_in == date %}
-                                <div class="booking-bar booking-{{ booking.color }}"
+                                <div class="booking-bar booking-{{ booking.color }} booking-angled"
                                      style="width: calc({{ booking.nights }}00% - 4px); grid-column-end: span {{ booking.nights }};"
                                      onclick="viewBooking({{ booking.id }})"
                                      title="{{ booking.guest_name }} ({{ booking.check_in|date:'M j' }}-{{ booking.check_out|date:'M j' }})">
-                                    {{ booking.guest_name }}
+                                    <span class="booking-text">{{ booking.guest_name }}</span>
                                 </div>
                                 {% endif %}
                             {% endfor %}

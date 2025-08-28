@@ -147,28 +147,32 @@ body {
 .room-header-cell {
     background: #f8f9fa;
     padding: 16px 20px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    color: #666666;
-    border: 1px solid #e5e5e5;
-    border-right: 2px solid #e5e5e5;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+    border-right: 2px solid #e2e8f0;
     display: flex;
     align-items: center;
     position: sticky;
     left: 0;
     z-index: 100;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .date-header-cell {
     background: #f8f9fa;
     padding: 12px 8px;
     text-align: center;
-    font-size: 13px;
-    font-weight: 500;
-    color: #333333;
-    border: 1px solid #e5e5e5;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
     border-left: none;
     min-width: 80px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Room Type Groups */
@@ -181,14 +185,14 @@ body {
 }
 
 .room-type-header-cell {
-    background: #f0f0f0;
+    background: #f1f5f9;
     padding: 12px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #333333;
-    border: 1px solid #e5e5e5;
-    border-top: 2px solid #e5e5e5;
-    border-right: 2px solid #e5e5e5;
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    border-top: 2px solid #cbd5e1;
+    border-right: 2px solid #e2e8f0;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -225,13 +229,13 @@ body {
 }
 
 .room-number-cell {
-    background: #fafafa;
+    background: #fefefe;
     padding: 16px 20px;
-    font-size: 15px;
-    font-weight: 500;
-    color: #333333;
-    border: 1px solid #e5e5e5;
-    border-right: 2px solid #e5e5e5;
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-right: 2px solid #e2e8f0;
     border-top: none;
     display: flex;
     align-items: center;
@@ -239,11 +243,12 @@ body {
     left: 0;
     z-index: 98;
     min-height: 60px;
+    letter-spacing: 0.5px;
 }
 
 .date-cell {
     background: #ffffff;
-    border: 1px solid #f0f0f0;
+    border: 1px solid #f1f5f9;
     border-left: none;
     border-top: none;
     min-height: 60px;
@@ -254,23 +259,22 @@ body {
 }
 
 .date-cell:hover {
-    background: #fafafa;
+    background: #f8fafc;
 }
 
-/* Booking Bars - Spanning Multiple Days CORRECTLY */
+/* Booking Bars - Sample Design with Angled Edges */
 .booking-bar {
     position: absolute;
     left: 2px;
     height: 32px;
-    border-radius: 4px;
     color: white;
     font-size: 12px;
     font-weight: 500;
     display: flex;
     align-items: center;
-    padding: 0 8px;
+    padding: 0 8px 0 12px;
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     transition: all 0.2s ease;
     z-index: 10;
     overflow: hidden;
@@ -278,36 +282,44 @@ body {
     text-overflow: ellipsis;
     top: 50%;
     transform: translateY(-50%);
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
+    border-radius: 3px 0 0 3px;
 }
 
 .booking-bar:hover {
     transform: translateY(-50%) translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
 
-/* Booking Colors - Matching Sample */
+.booking-text {
+    position: relative;
+    z-index: 2;
+}
+
+/* Booking Colors - Exact Sample Match */
 .booking-green {
-    background: linear-gradient(135deg, #34d399, #10b981);
+    background: linear-gradient(135deg, #4ade80, #22c55e);
 }
 
 .booking-blue {
-    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
 }
 
 .booking-violet {
-    background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+    background: linear-gradient(135deg, #a855f7, #9333ea);
 }
 
 .booking-red {
-    background: linear-gradient(135deg, #f87171, #ef4444);
+    background: linear-gradient(135deg, #fb7185, #f43f5e);
 }
 
 .booking-gray {
-    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    background: linear-gradient(135deg, #94a3b8, #64748b);
 }
 
 .booking-yellow {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, #facc15, #eab308);
     color: #1f2937;
 }
 

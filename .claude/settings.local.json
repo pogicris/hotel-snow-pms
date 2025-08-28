@@ -15,7 +15,9 @@
       "Bash(git config:*)",
       "Bash(\"C:\\PY\\hotel_pms_project\\Rev9\\deploy_simple.bat\")",
       "Bash(git pull:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": [],

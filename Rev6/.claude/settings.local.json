@@ -8,14 +8,7 @@
       "Bash(python:*)",
       "Bash(xcopy:*)",
       "Bash(robocopy:*)",
-      "Bash(find:*)",
-      "Bash(mkdir:*)",
-      "Bash(cp:*)",
-      "Bash(chmod:*)",
-      "Bash(git config:*)",
-      "Bash(\"C:\\PY\\hotel_pms_project\\Rev9\\deploy_simple.bat\")",
-      "Bash(git pull:*)",
-      "Bash(git add:*)"
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": [],

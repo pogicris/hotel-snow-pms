@@ -90,25 +90,14 @@ WSGI_APPLICATION = 'hotel_pms.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# Database configuration
 DATABASES = {
     'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
-        conn_max_age=600
+        default=config('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
+        conn_max_age=600,
+        conn_health_checks=True,
     )
 }
-
-# Handle different PostgreSQL drivers
-import django.db.backends.postgresql.base as postgresql_base
-try:
-    import psycopg2
-except ImportError:
-    try:
-        import psycopg as psycopg2
-        import psycopg.extras
-        # Compatibility layer
-        postgresql_base.Database = psycopg2
-    except ImportError:
-        pass
 
 
 # Password validation

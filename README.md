@@ -1,6 +1,6 @@
-# Hotel Snow PMS ❄️
+# 🏨 Hotel Snow PMS - Production Ready
 
-A comprehensive Property Management System for Hotel Snow, built with Django 4.2 and Python 3.10.
+A modern Django-based Property Management System featuring an advanced timeline view with collapsible room types and parallelogram booking bars.
 
 ## Features
 

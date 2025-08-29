@@ -55,5 +55,23 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
+# Development folders and files
+Rev*/
+p*.png
+*.webp
+*.docx
+debug_views.py
+launch_hotel_pms.py
+setup_database.py
+simple_setup*.py
+Dockerfile*
+render_dockerfile
+requirements_*txt
+TROUBLESHOOTING.md
+DEPLOYMENT_GUIDE.md
+flowchart.png
+*.bat
+revised-Dockerfile/
+
 # Render
 .render/

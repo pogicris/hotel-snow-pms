@@ -7,7 +7,7 @@ services:
   - type: web
     name: hotel-snow-pms
     runtime: python3
-    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate && python manage.py setup_rooms"
     startCommand: "gunicorn hotel_pms.wsgi:application"
     envVars:
       - key: DATABASE_URL

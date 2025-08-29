@@ -7,10 +7,6 @@ import holidays
 
 class RoomType(models.Model):
     ROOM_TYPE_CHOICES = [
-        ('LOFT', 'Loft'),
-        ('SINGLE', 'Single'),
-        ('DOUBLE', 'Double'),
-        ('TRIPLE', 'Triple'),
         ('STUDIO_A', 'Studio A'),
         ('STUDIO_A_PROMO', 'Studio A Promo'),
         ('STUDIO_B', 'Studio B'),
@@ -26,10 +22,6 @@ class RoomType(models.Model):
     description = models.TextField(blank=True)
     base_weekday_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     base_weekend_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    display_order = models.IntegerField(default=0)
-    
-    class Meta:
-        ordering = ['display_order', 'name']
     
     def __str__(self):
         return self.get_name_display()
@@ -123,15 +115,12 @@ class Booking(models.Model):
         if self.status == 'NO_SHOW':
             return 'red'
         elif self.payment_status == 'PAID':
-            return 'blue'
+            return 'green'
         elif self.payment_status == 'PARTIAL':
             return 'violet'
         elif self.status == 'PENCIL':
-            return 'green'
+            return 'yellow'
         return 'gray'
-    
-    def get_nights_count(self):
-        return (self.check_out_date - self.check_in_date).days
     
     def __str__(self):
         return f"{self.guest_name} - {self.room} ({self.check_in_date} to {self.check_out_date})"

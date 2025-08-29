@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}New Booking - Hotel Snow PMS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>📝 Create New Booking</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="guest_name" class="form-label">Guest Name *</label>
+                                <input type="text" class="form-control" id="guest_name" name="guest_name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="guest_contact" class="form-label">Guest Contact</label>
+                                <input type="text" class="form-control" id="guest_contact" name="guest_contact">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="check_in_date" class="form-label">Check-in Date *</label>
+                                <input type="date" class="form-control" id="check_in_date" name="check_in_date" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="check_out_date" class="form-label">Check-out Date *</label>
+                                <input type="date" class="form-control" id="check_out_date" name="check_out_date" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="room" class="form-label">Select Room *</label>
+                        <select class="form-select" id="room" name="room" required>
+                            <option value="">Choose a room...</option>
+                            {% regroup rooms by room_type as room_groups %}
+                            {% for group in room_groups %}
+                            <optgroup label="{{ group.grouper.get_name_display }} (₱{{ group.grouper.base_weekday_rate }}/₱{{ group.grouper.base_weekend_rate }})">
+                                {% for room in group.list %}
+                                <option value="{{ room.id }}">{{ room.room_number }}</option>
+                                {% endfor %}
+                            </optgroup>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'timeline' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Create Booking</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rate Preview -->
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>💰 Rate Information</h5>
+            </div>
+            <div class="card-body">
+                <div id="ratePreview">
+                    <p class="text-muted">Select dates and room to see rate calculation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkInDate = document.getElementById('check_in_date');
+    const checkOutDate = document.getElementById('check_out_date');
+    const roomSelect = document.getElementById('room');
+    const ratePreview = document.getElementById('ratePreview');
+    
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    checkInDate.min = today;
+    
+    // Update check-out minimum when check-in changes
+    checkInDate.addEventListener('change', function() {
+        const selectedDate = new Date(this.value);
+        selectedDate.setDate(selectedDate.getDate() + 1);
+        checkOutDate.min = selectedDate.toISOString().split('T')[0];
+        updateRatePreview();
+    });
+    
+    checkOutDate.addEventListener('change', updateRatePreview);
+    roomSelect.addEventListener('change', updateRatePreview);
+    
+    function updateRatePreview() {
+        if (!checkInDate.value || !checkOutDate.value || !roomSelect.value) {
+            ratePreview.innerHTML = '<p class="text-muted">Select dates and room to see rate calculation.</p>';
+            return;
+        }
+        
+        const checkIn = new Date(checkInDate.value);
+        const checkOut = new Date(checkOutDate.value);
+        
+        if (checkIn >= checkOut) {
+            ratePreview.innerHTML = '<p class="text-danger">Check-out date must be after check-in date.</p>';
+            return;
+        }
+        
+        // Get selected room info
+        const selectedOption = roomSelect.options[roomSelect.selectedIndex];
+        const roomNumber = selectedOption.text;
+        const optgroup = selectedOption.parentElement;
+        const rateInfo = optgroup.label.match(/\(₱(\d+)\/₱(\d+)\)/);
+        
+        if (rateInfo) {
+            const weekdayRate = parseInt(rateInfo[1]);
+            const weekendRate = parseInt(rateInfo[2]);
+            
+            let totalAmount = 0;
+            let nights = 0;
+            let weekdayNights = 0;
+            let weekendNights = 0;
+            
+            const currentDate = new Date(checkIn);
+            while (currentDate < checkOut) {
+                nights++;
+                const dayOfWeek = currentDate.getDay();
+                
+                if (dayOfWeek === 5 || dayOfWeek === 6) { // Friday or Saturday
+                    weekendNights++;
+                    totalAmount += weekendRate;
+                } else {
+                    weekdayNights++;
+                    totalAmount += weekdayRate;
+                }
+                
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            ratePreview.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Room: ${roomNumber}</h6>
+                        <p>Check-in: ${checkInDate.value}<br>
+                        Check-out: ${checkOutDate.value}<br>
+                        Total Nights: ${nights}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Rate Breakdown:</h6>
+                        <p>Weekdays (${weekdayNights} nights): ₱${(weekdayNights * weekdayRate).toLocaleString()}<br>
+                        Weekends (${weekendNights} nights): ₱${(weekendNights * weekendRate).toLocaleString()}<br>
+                        <strong>Total Amount: ₱${totalAmount.toLocaleString()}</strong></p>
+                    </div>
+                </div>
+            `;
+        }
+    }
+});
+</script>
+{% endblock %}

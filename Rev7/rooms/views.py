@@ -81,53 +81,37 @@ def timeline_view(request):
     
     end_date = start_date + timedelta(days=13)
     
-    # Get all rooms grouped by room type
-    room_types = RoomType.objects.all().order_by('display_order', 'name')
+    # Get all rooms
+    rooms = Room.objects.filter(is_active=True).select_related('room_type').order_by('room_number')
     
     # Get bookings for the timeline
     bookings = Booking.objects.filter(
         Q(check_in_date__lte=end_date) & Q(check_out_date__gte=start_date)
-    ).select_related('room', 'room__room_type').order_by('check_in_date')
+    ).select_related('room', 'room__room_type')
     
-    # Create timeline data grouped by room type
+    # Create timeline data
     timeline_data = []
-    
-    for room_type in room_types:
-        rooms = Room.objects.filter(
-            is_active=True, 
-            room_type=room_type
-        ).order_by('room_number')
+    for room in rooms:
+        room_bookings = bookings.filter(room=room)
+        room_data = {
+            'room': room,
+            'bookings': []
+        }
         
-        if rooms.exists():
-            room_type_data = {
-                'room_type': room_type,
-                'rooms': []
-            }
-            
-            for room in rooms:
-                room_bookings = bookings.filter(room=room)
-                room_data = {
-                    'room': room,
-                    'bookings': []
-                }
-                
-                for booking in room_bookings:
-                    room_data['bookings'].append({
-                        'id': booking.id,
-                        'guest_name': booking.guest_name,
-                        'check_in': booking.check_in_date,
-                        'check_out': booking.check_out_date,
-                        'status': booking.status,
-                        'payment_status': booking.payment_status,
-                        'color': booking.get_display_color(),
-                        'total_amount': booking.total_amount,
-                        'paid_amount': booking.paid_amount,
-                        'nights': booking.get_nights_count(),
-                    })
-                
-                room_type_data['rooms'].append(room_data)
-            
-            timeline_data.append(room_type_data)
+        for booking in room_bookings:
+            room_data['bookings'].append({
+                'id': booking.id,
+                'guest_name': booking.guest_name,
+                'check_in': booking.check_in_date,
+                'check_out': booking.check_out_date,
+                'status': booking.status,
+                'payment_status': booking.payment_status,
+                'color': booking.get_display_color(),
+                'total_amount': booking.total_amount,
+                'paid_amount': booking.paid_amount,
+            })
+        
+        timeline_data.append(room_data)
     
     # Generate date range for header
     date_range = []
@@ -136,13 +120,6 @@ def timeline_view(request):
         date_range.append(current_date)
         current_date += timedelta(days=1)
     
-    # Count stats
-    total_bookings = bookings.count()
-    total_rooms = Room.objects.filter(is_active=True).count()
-    occupied_rooms = bookings.values('room').distinct().count()
-    occupancy_rate = round((occupied_rooms / total_rooms * 100) if total_rooms > 0 else 0, 1)
-    total_revenue = sum(b.total_amount for b in bookings)
-    
     context = {
         'timeline_data': timeline_data,
         'date_range': date_range,
@@ -150,11 +127,6 @@ def timeline_view(request):
         'end_date': end_date,
         'prev_week': start_date - timedelta(days=14),
         'next_week': start_date + timedelta(days=14),
-        'stats': {
-            'total_bookings': total_bookings,
-            'occupancy_rate': occupancy_rate,
-            'total_revenue': total_revenue,
-        }
     }
     
     return render(request, 'rooms/timeline.html', context)

@@ -7,10 +7,6 @@ import holidays
 
 class RoomType(models.Model):
     ROOM_TYPE_CHOICES = [
-        ('LOFT', 'Loft'),
-        ('SINGLE', 'Single'),
-        ('DOUBLE', 'Double'),
-        ('TRIPLE', 'Triple'),
         ('STUDIO_A', 'Studio A'),
         ('STUDIO_A_PROMO', 'Studio A Promo'),
         ('STUDIO_B', 'Studio B'),
@@ -20,6 +16,10 @@ class RoomType(models.Model):
         ('PENTHOUSE', 'Penthouse'),
         ('MODULE_HOUSE', 'Module House'),
         ('KTV', 'KTV Room'),
+        ('LOFT', 'Loft'),
+        ('SINGLE', 'Single'),
+        ('DOUBLE', 'Double'),
+        ('TRIPLE', 'Triple'),
     ]
     
     name = models.CharField(max_length=50, choices=ROOM_TYPE_CHOICES, unique=True)

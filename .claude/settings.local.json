@@ -21,7 +21,10 @@
       "Bash(git checkout:*)",
       "Bash(taskkill:*)",
       "Bash(lsof:*)",
-      "Bash(cmd //c:*)"
+      "Bash(cmd //c:*)",
+      "Bash(docker build:*)",
+      "Bash(git fetch:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": [],

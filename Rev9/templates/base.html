@@ -86,13 +86,9 @@
         </div>
         {% endif %}
         
-        {% if user.is_authenticated %}
         <div class="container-fluid mt-4">
             {% block content %}{% endblock %}
         </div>
-        {% else %}
-        {% block content %}{% endblock %}
-        {% endif %}
     </main>
     
     <!-- Footer -->

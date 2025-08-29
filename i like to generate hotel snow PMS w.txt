@@ -1,0 +1,91 @@
+i like to generate "hotel snow PMS" which has purpose to build code with python 3.10 and Django framework 4.2
+and using the SQL in the web. using the "RENDER" website as well. and using the SQL in the web. using the "RENDER" website as well. 
+i already register to Render,com 
+id : con4cros@gmail.com 
+password : 1971!Kendocho
+
+hotel snow pms code should have following function. 
+
+1. control room. 
+hotel snow has several type of room. 
+studio A, studio A-promo, Studio B, studio Deluxe, Family room w/ balcony, Family room w/o balcony,
+Penthouse, and module house, last "KTV"
+
+stuido A - 101,102,103,104,105,106,107,    110,111,112,113,114,115,116,117,  totally 15rooms
+studio A promo - 108,109 and 118,119 totally 4rooms
+Studio B - 201,203,205,207,209,211,212 totally 7rooms
+Stuido Deluxe - 202, 204, 206, 208, 210 totally 5rooms
+Family room w/o balacony - 216, 214 totally 2rooms
+Family room w/ balcony - 213, 215 totally 2rooms
+Penthouse - 301,302
+module house - 401,402
+KTV rooms - 501,502,503,504
+
+2. control of room rate
+- following philiipine holiday
+- weekend rate Fri-Sat 
+- Weekday rate sun-thurs
+- holiday and weekend rate is same
+- once change the rate of room, should be correspond to all of same kind of room.
+e.g. change rate to studio A, 101 should be follow all of studio A rooms, 102-117 execept Studio A promo. 
+cos this is different room type
+
+3. login and encrypt function.
+a. admin - see the all of log record, delete or cancel book, change schedule etc
+b. members - cant see log record
+c. super - change the room rate, and make memo for popup. and erase all except himself.
+and the menu control the password, and delete the members
+
+4. schedule or timeline for booking should be shown the bar style.
+- base on from the booking input data should be reflect to the timeline
+- timeline should be shown every week but can allow scroll to go the other wks
+- x axile is the date, y axile is the room numbers. each axile can scrolling each way. 
+
+5. there is several way of check in status
+- and it should be sperated own colored 
+- green : fully paid
+- yellow : pencil booked
+- red : not arrived
+- violet : balance
+and once get the data from booking window, should be shown the color bar corresponding period of booking
+
+6. id and password
+1. Super User (Full Admin Access)
+
+  - Username: superadmin
+  - Password: snow2024!
+  - Access Level: Everything
+    - ✅ Create/Edit/Delete bookings
+    - ✅ Manage room rates
+    - ✅ System memos & popups
+    - ✅ View all logs
+    - ✅ Django admin panel
+    - ✅ User management
+
+  2. Admin User (Management Access)
+
+  - Username: admin
+  - Password: admin2024!
+  - Access Level: Management
+    - ✅ Create/Edit/Delete bookings
+    - ✅ View logs and reports
+    - ✅ Booking management
+    - ❌ Cannot change rates
+    - ❌ Cannot create system memos
+
+  3. Member User (Basic Staff)
+
+  - Username: frontdesk
+  - Password: front2024!
+  - Access Level: Basic operations
+    - ✅ Create/Edit bookings
+    - ✅ Update payment status
+    - ✅ View timeline
+    - ❌ Cannot delete bookings
+    - ❌ Cannot view logs
+    - ❌ Cannot change rates
+
+
+
+
+

@@ -1,0 +1,51 @@
+Better Approach - Step by Step:
+1. Start with:
+"Generate Django project setup commands for a hotel PMS system"
+
+2. Then ask:
+"Create Django models for hotel rooms, bookings, and guests"
+
+3. Then:
+"Generate Django views and templates for room booking"
+
+4. Finally:
+"Create Django admin interface for hotel management"
+
+What AI CAN'T Do:
+Install Python/Django for youBetter Approach - Step by Step:
+1. Start with:
+"Generate Django project setup commands for a hotel PMS system"
+
+2. Then ask:
+"Create Django models for hotel rooms, bookings, and guests"
+
+3. Then:
+"Generate Django views and templates for room booking"
+
+4. Finally:
+"Create Django admin interface for hotel management"
+
+What AI CAN'T Do:
+
+Install Python/Django for you
+Run the server automatically
+Deploy to web without your configuration
+
+
+What AI CAN Do:
+
+Generate all the Django code files
+Create database models
+Build forms and templates
+Set up URL routing
+Create admin interfaces
+Ready to start? First, make sure you have Python installed, then we can generate the Django code step by step!
+Run the server automatically
+Deploy to web without your configuration
+What AI CAN Do:
+Generate all the Django code files
+Create database models
+Build forms and templates
+Set up URL routing
+Create admin interfaces
+Ready to start? First, make sure you have Python installed, then we can generate the Django code step by step!

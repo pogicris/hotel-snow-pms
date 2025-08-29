@@ -1,0 +1,3 @@
+1. new book - previous occupided booked room should be unable mark. and not allow the click 
+2. update status - should add " check-out " once check out, the room can sell status. 
+3. full occupied each type of room, make a alarm with pop up window, "close online booking" and if the room is available, erase the alram box. 

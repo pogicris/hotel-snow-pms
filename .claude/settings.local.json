@@ -24,7 +24,10 @@
       "Bash(cmd //c:*)",
       "Bash(docker build:*)",
       "Bash(git fetch:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(set DEBUG=False)",
+      "Bash(set SECRET_KEY=test-secret-key-for-testing)",
+      "WebFetch(domain:127.0.0.1)"
     ],
     "deny": [],
     "ask": [],

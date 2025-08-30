@@ -30,5 +30,19 @@ RUN python manage.py collectstatic --noinput
 # Expose port
 EXPOSE 8000
 
-# Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "hotel_pms.wsgi:application"]
+# Create a startup script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "Running database migrations..."\n\
+python manage.py migrate --noinput\n\
+echo "Creating initial users..."\n\
+python manage.py create_initial_users || echo "Users already exist or error creating users"\n\
+echo "Setting up rooms..."\n\
+python manage.py setup_rooms || echo "Rooms already exist or error setting up rooms"\n\
+echo "Collecting static files..."\n\
+python manage.py collectstatic --noinput --clear\n\
+echo "Starting gunicorn server..."\n\
+gunicorn --bind 0.0.0.0:8000 --workers 2 --timeout 120 hotel_pms.wsgi:application\n' > /app/start.sh && chmod +x /app/start.sh
+
+# Run the application with migrations
+CMD ["/app/start.sh"]

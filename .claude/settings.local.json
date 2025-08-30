@@ -27,7 +27,9 @@
       "WebFetch(domain:github.com)",
       "Bash(set DEBUG=False)",
       "Bash(set SECRET_KEY=test-secret-key-for-testing)",
-      "WebFetch(domain:127.0.0.1)"
+      "WebFetch(domain:127.0.0.1)",
+      "Bash(timeout:*)",
+      "WebFetch(domain:hotel-snow-pms-docker.onrender.com)"
     ],
     "deny": [],
     "ask": [],

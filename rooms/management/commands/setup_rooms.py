@@ -21,7 +21,7 @@ class Command(BaseCommand):
                 'rooms': ['108', '109', '118', '119'],
                 'weekday_rate': Decimal('1800.00'),
                 'weekend_rate': Decimal('2200.00'),
-                'display_order': 11
+                'display_order': 20
             },
             {
                 'type': 'STUDIO_B',
@@ -29,7 +29,7 @@ class Command(BaseCommand):
                 'rooms': ['201', '203', '205', '207', '209', '211', '212'],
                 'weekday_rate': Decimal('2200.00'),
                 'weekend_rate': Decimal('2700.00'),
-                'display_order': 12
+                'display_order': 30
             },
             {
                 'type': 'STUDIO_DELUXE',
@@ -37,7 +37,7 @@ class Command(BaseCommand):
                 'rooms': ['202', '204', '206', '208', '210'],
                 'weekday_rate': Decimal('2800.00'),
                 'weekend_rate': Decimal('3300.00'),
-                'display_order': 20
+                'display_order': 40
             },
             {
                 'type': 'FAMILY_NO_BALCONY',
@@ -45,7 +45,7 @@ class Command(BaseCommand):
                 'rooms': ['216', '214'],
                 'weekday_rate': Decimal('3500.00'),
                 'weekend_rate': Decimal('4000.00'),
-                'display_order': 30
+                'display_order': 50
             },
             {
                 'type': 'FAMILY_WITH_BALCONY',
@@ -53,7 +53,7 @@ class Command(BaseCommand):
                 'rooms': ['213', '215'],
                 'weekday_rate': Decimal('4000.00'),
                 'weekend_rate': Decimal('4500.00'),
-                'display_order': 31
+                'display_order': 60
             },
             {
                 'type': 'PENTHOUSE',
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 'rooms': ['301', '302'],
                 'weekday_rate': Decimal('6000.00'),
                 'weekend_rate': Decimal('7000.00'),
-                'display_order': 40
+                'display_order': 70
             },
             {
                 'type': 'MODULE_HOUSE',
@@ -69,7 +69,7 @@ class Command(BaseCommand):
                 'rooms': ['401', '402'],
                 'weekday_rate': Decimal('5000.00'),
                 'weekend_rate': Decimal('6000.00'),
-                'display_order': 50
+                'display_order': 80
             },
             {
                 'type': 'KTV',
@@ -77,7 +77,7 @@ class Command(BaseCommand):
                 'rooms': ['501', '502', '503', '504'],
                 'weekday_rate': Decimal('1500.00'),
                 'weekend_rate': Decimal('2000.00'),
-                'display_order': 60
+                'display_order': 90
             }
         ]
 

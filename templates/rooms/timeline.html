@@ -119,7 +119,7 @@ function toggleGroup(groupName) {
     const icon = document.getElementById('icon-' + groupName);
     
     if (rooms.style.display === 'none') {
-        rooms.style.display = 'block';
+        rooms.style.display = 'contents';
         icon.textContent = '▼';
     } else {
         rooms.style.display = 'none';

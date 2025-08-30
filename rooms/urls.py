@@ -10,4 +10,5 @@ urlpatterns = [
     path('booking/<int:booking_id>/', views.booking_detail, name='booking_detail'),
     path('manage-rates/', views.manage_rates, name='manage_rates'),
     path('system-memo/', views.system_memo, name='system_memo'),
+    path('activity-log/', views.activity_log_view, name='activity_log'),
 ]

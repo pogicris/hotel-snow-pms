@@ -51,7 +51,7 @@
                             <option value="">Choose a room...</option>
                             {% regroup rooms by room_type as room_groups %}
                             {% for group in room_groups %}
-                            <optgroup label="{{ group.grouper.get_name_display }} (₱{{ group.grouper.base_weekday_rate }}/₱{{ group.grouper.base_weekend_rate }})">
+                            <optgroup label="{{ group.grouper.get_name_display }} (₱{{ group.grouper.base_weekday_rate|floatformat:0 }}/₱{{ group.grouper.base_weekend_rate|floatformat:0 }})">
                                 {% for room in group.list %}
                                 <option value="{{ room.id }}">{{ room.room_number }}</option>
                                 {% endfor %}

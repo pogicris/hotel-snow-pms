@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, date
 import json
 from decimal import Decimal
 
-from .models import Room, RoomType, Booking, CustomUser, SystemMemo
+from .models import Room, RoomType, Booking, CustomUser, SystemMemo, ActivityLog
 
 def is_admin_or_super(user):
     return user.is_authenticated and (user.user_type in ['ADMIN', 'SUPER'])
@@ -286,3 +286,17 @@ def system_memo(request):
     }
     
     return render(request, 'rooms/system_memo.html', context)
+
+@login_required
+@user_passes_test(is_super_user)
+def activity_log_view(request):
+    log_list = ActivityLog.objects.all()
+    paginator = Paginator(log_list, 25)  # Show 25 logs per page.
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+    }
+    return render(request, 'rooms/activity_log.html', context)

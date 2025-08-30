@@ -152,3 +152,17 @@ class SystemMemo(models.Model):
     
     class Meta:
         ordering = ['-created_at']
+
+class ActivityLog(models.Model):
+    user = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
+    action = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    path = models.CharField(max_length=255)
+    method = models.CharField(max_length=10)
+
+    def __str__(self):
+        return f"{self.user} - {self.action} at {self.timestamp}"
+
+    class Meta:
+        ordering = ['-timestamp']

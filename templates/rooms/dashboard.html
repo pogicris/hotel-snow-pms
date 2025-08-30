@@ -139,8 +139,8 @@
                                 <h6 class="mb-0">{{ group.grouper.get_name_display }}</h6>
                             </div>
                             <div class="card-body">
-                                <p class="mb-1"><small>Weekday: ₱{{ group.grouper.base_weekday_rate }}</small></p>
-                                <p class="mb-2"><small>Weekend: ₱{{ group.grouper.base_weekend_rate }}</small></p>
+                                <p class="mb-1"><small>Weekday: ₱{{ group.grouper.base_weekday_rate|floatformat:0 }}</small></p>
+                                <p class="mb-2"><small>Weekend: ₱{{ group.grouper.base_weekend_rate|floatformat:0 }}</small></p>
                                 <div class="room-numbers">
                                     {% for room in group.list %}
                                     <span class="badge bg-light text-dark me-1">{{ room.room_number }}</span>

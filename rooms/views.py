@@ -11,7 +11,8 @@ from datetime import datetime, timedelta, date
 import json
 from decimal import Decimal
 
-from .models import Room, RoomType, Booking, CustomUser, SystemMemo, ActivityLog
+from .models import Room, RoomType, Booking, CustomUser, SystemMemo, ActivityLog, DataBackup
+from .backup_utils import export_bookings_to_excel, import_bookings_from_excel, create_backup_record
 
 def is_admin_or_super(user):
     return user.is_authenticated and (user.user_type in ['ADMIN', 'SUPER'])
@@ -300,3 +301,152 @@ def activity_log_view(request):
         'page_obj': page_obj,
     }
     return render(request, 'rooms/activity_log.html', context)
+
+@login_required
+@user_passes_test(is_super_user)
+def backup_management(request):
+    """View for managing backups - list, export, import"""
+    # Get all backups ordered by creation time
+    backup_list = DataBackup.objects.all().order_by('-created_at')
+    paginator = Paginator(backup_list, 20)  # Show 20 backups per page
+    
+    page_number = request.GET.get('page')
+    backups = paginator.get_page(page_number)
+    
+    context = {
+        'backups': backups,
+        'total_backups': DataBackup.objects.count(),
+        'auto_backups': DataBackup.objects.filter(backup_type='AUTO').count(),
+        'manual_backups': DataBackup.objects.filter(backup_type='MANUAL').count(),
+    }
+    
+    return render(request, 'rooms/backup_management.html', context)
+
+@login_required
+@user_passes_test(is_super_user)
+def export_data(request):
+    """Export current data to Excel format"""
+    try:
+        # Create manual backup record
+        backup = create_backup_record(
+            backup_type='MANUAL',
+            user=request.user,
+            notes=f'Manual export by {request.user.username}'
+        )
+        
+        # Generate Excel file
+        excel_buffer = export_bookings_to_excel()
+        
+        # Create HTTP response with Excel file
+        response = HttpResponse(
+            excel_buffer.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{backup.file_name}"'
+        
+        messages.success(request, f'Data exported successfully. Backup record created: {backup.file_name}')
+        return response
+        
+    except Exception as e:
+        messages.error(request, f'Error exporting data: {str(e)}')
+        return redirect('backup_management')
+
+@login_required
+@user_passes_test(is_super_user)
+def import_data(request):
+    """Import data from Excel file"""
+    if request.method == 'POST':
+        if 'excel_file' not in request.FILES:
+            messages.error(request, 'No file selected for import')
+            return redirect('backup_management')
+        
+        excel_file = request.FILES['excel_file']
+        
+        if not excel_file.name.endswith(('.xlsx', '.xls')):
+            messages.error(request, 'Please select a valid Excel file (.xlsx or .xls)')
+            return redirect('backup_management')
+        
+        try:
+            # Import the data
+            result = import_bookings_from_excel(excel_file, request.user)
+            
+            # Create import backup record
+            excel_file.seek(0)  # Reset file pointer
+            file_data = excel_file.read()
+            
+            backup = create_backup_record(
+                backup_type='IMPORT',
+                user=request.user,
+                file_data=file_data,
+                notes=f'Data import by {request.user.username}: {result["message"]}'
+            )
+            
+            if result['success']:
+                messages.success(request, result['message'])
+            else:
+                messages.warning(request, result['message'])
+                if 'errors' in result:
+                    for error in result['errors'][:5]:  # Show first 5 errors
+                        messages.error(request, error)
+            
+            return redirect('backup_management')
+            
+        except Exception as e:
+            messages.error(request, f'Error importing data: {str(e)}')
+            return redirect('backup_management')
+    
+    return redirect('backup_management')
+
+@login_required
+@user_passes_test(is_super_user)
+def download_backup(request, backup_id):
+    """Download a specific backup file"""
+    try:
+        backup = get_object_or_404(DataBackup, id=backup_id)
+        
+        response = HttpResponse(
+            backup.file_data,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{backup.file_name}"'
+        
+        return response
+        
+    except Exception as e:
+        messages.error(request, f'Error downloading backup: {str(e)}')
+        return redirect('backup_management')
+
+@login_required
+@user_passes_test(is_super_user)
+def delete_backup(request, backup_id):
+    """Delete a specific backup"""
+    if request.method == 'POST':
+        try:
+            backup = get_object_or_404(DataBackup, id=backup_id)
+            backup_name = backup.file_name
+            backup.delete()
+            
+            messages.success(request, f'Backup {backup_name} deleted successfully')
+            
+        except Exception as e:
+            messages.error(request, f'Error deleting backup: {str(e)}')
+    
+    return redirect('backup_management')
+
+@login_required
+@user_passes_test(is_super_user)
+def manual_backup(request):
+    """Create a manual backup"""
+    try:
+        backup = create_backup_record(
+            backup_type='MANUAL',
+            user=request.user,
+            notes=f'Manual backup created by {request.user.username}'
+        )
+        
+        messages.success(request, f'Manual backup created successfully: {backup.file_name}')
+        
+    except Exception as e:
+        messages.error(request, f'Error creating manual backup: {str(e)}')
+    
+    return redirect('backup_management')

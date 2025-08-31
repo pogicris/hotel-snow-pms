@@ -166,3 +166,35 @@ class ActivityLog(models.Model):
 
     class Meta:
         ordering = ['-timestamp']
+
+class DataBackup(models.Model):
+    BACKUP_TYPE_CHOICES = [
+        ('AUTO', 'Automatic Backup'),
+        ('MANUAL', 'Manual Backup'),
+        ('IMPORT', 'Data Import'),
+    ]
+    
+    backup_type = models.CharField(max_length=10, choices=BACKUP_TYPE_CHOICES, default='AUTO')
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
+    file_name = models.CharField(max_length=255)
+    file_data = models.BinaryField()  # Store Excel file data
+    booking_count = models.IntegerField(default=0)
+    room_count = models.IntegerField(default=0)
+    notes = models.TextField(blank=True)
+    
+    def __str__(self):
+        return f"{self.get_backup_type_display()} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['backup_type', '-created_at']),
+            models.Index(fields=['-created_at']),
+        ]
+    
+    def get_file_size(self):
+        """Get file size in KB"""
+        if self.file_data:
+            return len(self.file_data) / 1024
+        return 0

@@ -17,6 +17,7 @@ urlpatterns = [
     path('export-data/', views.export_data, name='export_data'),
     path('import-data/', views.import_data, name='import_data'),
     path('manual-backup/', views.manual_backup, name='manual_backup'),
+    path('trigger-auto-backup/', views.trigger_auto_backup, name='trigger_auto_backup'),
     path('download-backup/<int:backup_id>/', views.download_backup, name='download_backup'),
     path('delete-backup/<int:backup_id>/', views.delete_backup, name='delete_backup'),
 ]

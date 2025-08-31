@@ -450,3 +450,18 @@ def manual_backup(request):
         messages.error(request, f'Error creating manual backup: {str(e)}')
     
     return redirect('backup_management')
+
+@login_required
+@user_passes_test(is_super_user)
+def trigger_auto_backup(request):
+    """Trigger automatic backup manually (for testing)"""
+    if request.method == 'POST':
+        try:
+            from django.core.management import call_command
+            call_command('run_auto_backup', force=True)
+            messages.success(request, 'Automatic backup triggered successfully!')
+            
+        except Exception as e:
+            messages.error(request, f'Error triggering automatic backup: {str(e)}')
+    
+    return redirect('backup_management')

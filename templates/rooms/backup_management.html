@@ -57,6 +57,12 @@
                         <a href="{% url 'manual_backup' %}" class="btn btn-info">
                             <i class="fas fa-save"></i> Create Manual Backup
                         </a>
+                        <form method="post" action="{% url 'trigger_auto_backup' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-clock"></i> Test Auto Backup
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

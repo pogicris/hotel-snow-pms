@@ -84,6 +84,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'rooms.middleware.ActivityLogMiddleware',
+    'rooms.backup_middleware.RequestBasedBackupTrigger',  # Automatic backup trigger
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

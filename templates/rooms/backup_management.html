@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load philippine_time %}
 
 {% block title %}Backup Management - Hotel Snow PMS{% endblock %}
 
@@ -6,7 +7,12 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <h2 class="mb-4">📁 Backup Management</h2>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">📁 Backup Management</h2>
+                <div class="text-muted">
+                    <small><i class="fas fa-clock"></i> Current time: {% current_ph_time %}</small>
+                </div>
+            </div>
             
             <!-- Backup Statistics -->
             <div class="row mb-4">
@@ -101,7 +107,7 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ backup.file_name }}</td>
-                                    <td>{{ backup.created_at|date:"M d, Y H:i" }}</td>
+                                    <td>{{ backup.created_at|ph_time }}</td>
                                     <td>{{ backup.created_by.username|default:"System" }}</td>
                                     <td>{{ backup.booking_count }}</td>
                                     <td>{{ backup.get_file_size|floatformat:1 }}</td>

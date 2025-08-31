@@ -2,6 +2,7 @@ import io
 from django.utils import timezone
 from django.http import HttpResponse
 from .models import Booking, Room, RoomType, DataBackup, CustomUser
+from .timezone_utils import now_in_philippines, format_philippine_time
 
 try:
     import pandas as pd
@@ -231,10 +232,10 @@ def get_payment_status_from_display(display_value):
 
 def create_backup_record(backup_type='AUTO', user=None, file_data=None, notes=''):
     """
-    Create a backup record in the database
+    Create a backup record in the database using Philippine timezone
     """
-    now = timezone.now()
-    file_name = f"hotel_backup_{now.strftime('%Y%m%d_%H%M%S')}.xlsx"
+    ph_now = now_in_philippines()
+    file_name = f"hotel_backup_{ph_now.strftime('%Y%m%d_%H%M%S')}_PHT.xlsx"
     
     if file_data is None:
         file_data = export_bookings_to_excel().getvalue()
@@ -278,6 +279,6 @@ def cleanup_old_backups():
 
 
 def generate_backup_filename():
-    """Generate a standardized backup filename"""
-    now = timezone.now()
-    return f"hotel_backup_{now.strftime('%Y%m%d_%H%M%S')}.xlsx"
+    """Generate a standardized backup filename using Philippine time"""
+    ph_now = now_in_philippines()
+    return f"hotel_backup_{ph_now.strftime('%Y%m%d_%H%M%S')}_PHT.xlsx"

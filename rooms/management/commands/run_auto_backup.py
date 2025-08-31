@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from rooms.backup_utils import create_backup_record, cleanup_old_backups
 from rooms.models import ActivityLog, DataBackup
+from rooms.timezone_utils import now_in_philippines, format_philippine_time
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,9 +34,10 @@ class Command(BaseCommand):
                     return
 
             # Create the backup
+            ph_now = now_in_philippines()
             backup = create_backup_record(
                 backup_type='AUTO',
-                notes=f'Automatic backup via command at {timezone.now().strftime("%Y-%m-%d %H:%M:%S")}'
+                notes=f'Automatic backup via command at {ph_now.strftime("%Y-%m-%d %H:%M:%S")} PHT'
             )
             
             # Log the activity

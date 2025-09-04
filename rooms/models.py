@@ -133,6 +133,29 @@ class Booking(models.Model):
     def get_nights_count(self):
         return (self.check_out_date - self.check_in_date).days
     
+    @classmethod
+    def check_room_availability(cls, room, check_in_date, check_out_date, exclude_booking_id=None):
+        """
+        Check if a room is available for the given date range.
+        Returns a list of conflicting bookings if any exist.
+        """
+        # Query for overlapping bookings
+        overlapping_bookings = cls.objects.filter(
+            room=room,
+            status__in=['PENCIL', 'CONFIRMED', 'CHECKED_IN']  # Only active bookings
+        ).filter(
+            # Check for date overlap: new booking overlaps with existing if:
+            # (new_check_in < existing_check_out) AND (new_check_out > existing_check_in)
+            check_in_date__lt=check_out_date,
+            check_out_date__gt=check_in_date
+        )
+        
+        # Exclude current booking if we're editing
+        if exclude_booking_id:
+            overlapping_bookings = overlapping_bookings.exclude(id=exclude_booking_id)
+        
+        return list(overlapping_bookings)
+    
     def __str__(self):
         return f"{self.guest_name} - {self.room} ({self.check_in_date} to {self.check_out_date})"
     

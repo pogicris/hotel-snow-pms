@@ -67,7 +67,7 @@
                     
                     <div class="d-flex justify-content-between">
                         <a href="{% url 'timeline' %}" class="btn btn-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Create Booking</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Create Booking</button>
                     </div>
                 </form>
             </div>
@@ -93,12 +93,46 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Double Booking Warning Modal -->
+<div class="modal fade" id="doubleBookingModal" tabindex="-1" aria-labelledby="doubleBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="doubleBookingModalLabel">⚠️ Double Booking Detected</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <strong>Warning:</strong> This room is already booked for overlapping dates!
+                </div>
+                <div id="conflictDetails"></div>
+                <p class="mt-3"><strong>Please:</strong></p>
+                <ul>
+                    <li>Choose different dates</li>
+                    <li>Select another room</li>
+                    <li>Or contact the guest to resolve the conflict</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="forceBookingBtn">Force Book Anyway</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const checkInDate = document.getElementById('check_in_date');
     const checkOutDate = document.getElementById('check_out_date');
     const roomSelect = document.getElementById('room');
     const ratePreview = document.getElementById('ratePreview');
+    const form = document.querySelector('form');
+    const submitBtn = document.getElementById('submitBtn');
+    const doubleBookingModal = new bootstrap.Modal(document.getElementById('doubleBookingModal'));
+    const forceBookingBtn = document.getElementById('forceBookingBtn');
+    
+    let allowForceBooking = false;
     
     // Set minimum date to today
     const today = new Date().toISOString().split('T')[0];
@@ -110,10 +144,138 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedDate.setDate(selectedDate.getDate() + 1);
         checkOutDate.min = selectedDate.toISOString().split('T')[0];
         updateRatePreview();
+        checkAvailability();
     });
     
-    checkOutDate.addEventListener('change', updateRatePreview);
-    roomSelect.addEventListener('change', updateRatePreview);
+    checkOutDate.addEventListener('change', function() {
+        updateRatePreview();
+        checkAvailability();
+    });
+    
+    roomSelect.addEventListener('change', function() {
+        updateRatePreview();
+        checkAvailability();
+    });
+    
+    // Form submission handler
+    form.addEventListener('submit', function(e) {
+        if (!allowForceBooking) {
+            e.preventDefault();
+            checkAvailabilityForSubmission();
+        }
+    });
+    
+    // Force booking button handler
+    forceBookingBtn.addEventListener('click', function() {
+        allowForceBooking = true;
+        doubleBookingModal.hide();
+        form.submit();
+    });
+    
+    function checkAvailability() {
+        if (!checkInDate.value || !checkOutDate.value || !roomSelect.value) {
+            return;
+        }
+        
+        fetch('{% url "check_availability" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                room_id: roomSelect.value,
+                check_in_date: checkInDate.value,
+                check_out_date: checkOutDate.value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success && data.conflicts) {
+                showAvailabilityWarning(data);
+            } else {
+                hideAvailabilityWarning();
+            }
+        })
+        .catch(error => {
+            console.error('Error checking availability:', error);
+        });
+    }
+    
+    function checkAvailabilityForSubmission() {
+        if (!checkInDate.value || !checkOutDate.value || !roomSelect.value) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+        
+        fetch('{% url "check_availability" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                room_id: roomSelect.value,
+                check_in_date: checkInDate.value,
+                check_out_date: checkOutDate.value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success && data.conflicts) {
+                showDoubleBookingModal(data);
+            } else {
+                allowForceBooking = true;
+                form.submit();
+            }
+        })
+        .catch(error => {
+            console.error('Error checking availability:', error);
+            alert('Error checking availability. Please try again.');
+        });
+    }
+    
+    function showAvailabilityWarning(data) {
+        const warningHtml = `
+            <div class="alert alert-warning mt-3" id="availabilityWarning">
+                <strong>⚠️ Availability Warning:</strong> Room ${data.room_number} has conflicting bookings for these dates.
+                <br><small>Click "Create Booking" to see details.</small>
+            </div>
+        `;
+        
+        const existingWarning = document.getElementById('availabilityWarning');
+        if (existingWarning) {
+            existingWarning.remove();
+        }
+        
+        ratePreview.insertAdjacentHTML('afterend', warningHtml);
+    }
+    
+    function hideAvailabilityWarning() {
+        const existingWarning = document.getElementById('availabilityWarning');
+        if (existingWarning) {
+            existingWarning.remove();
+        }
+    }
+    
+    function showDoubleBookingModal(data) {
+        let conflictHtml = `<h6>Room ${data.room_number} conflicts:</h6><ul>`;
+        
+        data.conflicts.forEach(conflict => {
+            conflictHtml += `
+                <li>
+                    <strong>${conflict.guest_name}</strong><br>
+                    <small>${conflict.check_in} to ${conflict.check_out} (${conflict.status})</small>
+                </li>
+            `;
+        });
+        
+        conflictHtml += '</ul>';
+        document.getElementById('conflictDetails').innerHTML = conflictHtml;
+        doubleBookingModal.show();
+    }
     
     function updateRatePreview() {
         if (!checkInDate.value || !checkOutDate.value || !roomSelect.value) {

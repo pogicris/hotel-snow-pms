@@ -7,6 +7,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('timeline/', views.timeline_view, name='timeline'),
     path('create-booking/', views.create_booking, name='create_booking'),
+    path('check-availability/', views.check_availability, name='check_availability'),
     path('booking/<int:booking_id>/', views.booking_detail, name='booking_detail'),
     path('manage-rates/', views.manage_rates, name='manage_rates'),
     path('system-memo/', views.system_memo, name='system_memo'),

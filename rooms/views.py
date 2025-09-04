@@ -177,6 +177,34 @@ def create_booking(request):
         
         room = get_object_or_404(Room, id=room_id)
         
+        # Check for double booking conflicts
+        conflicting_bookings = Booking.check_room_availability(room, check_in_date, check_out_date)
+        if conflicting_bookings:
+            conflict_details = []
+            for booking in conflicting_bookings:
+                conflict_details.append({
+                    'guest_name': booking.guest_name,
+                    'check_in': booking.check_in_date.strftime('%Y-%m-%d'),
+                    'check_out': booking.check_out_date.strftime('%Y-%m-%d'),
+                    'status': booking.get_status_display()
+                })
+            
+            # Return JSON response with conflict information for AJAX handling
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'error': 'double_booking',
+                    'conflicts': conflict_details,
+                    'room_number': room.room_number
+                })
+            
+            # For regular form submission, show error message
+            conflict_msg = f"Room {room.room_number} is already booked for overlapping dates:\n"
+            for booking in conflicting_bookings:
+                conflict_msg += f"• {booking.guest_name} ({booking.check_in_date} to {booking.check_out_date}) - {booking.get_status_display()}\n"
+            messages.error(request, conflict_msg)
+            return render(request, 'rooms/create_booking.html', {'rooms': Room.objects.filter(is_active=True)})
+        
         # Calculate total amount
         total_days = (check_out_date - check_in_date).days
         total_amount = Decimal('0')
@@ -203,6 +231,53 @@ def create_booking(request):
     
     rooms = Room.objects.filter(is_active=True).select_related('room_type')
     return render(request, 'rooms/create_booking.html', {'rooms': rooms})
+
+@login_required
+def check_availability(request):
+    """AJAX endpoint to check room availability for given dates"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            room_id = data.get('room_id')
+            check_in_date = datetime.strptime(data.get('check_in_date'), '%Y-%m-%d').date()
+            check_out_date = datetime.strptime(data.get('check_out_date'), '%Y-%m-%d').date()
+            
+            if not all([room_id, check_in_date, check_out_date]):
+                return JsonResponse({'success': False, 'error': 'Missing required fields'})
+            
+            if check_in_date >= check_out_date:
+                return JsonResponse({'success': False, 'error': 'Invalid date range'})
+            
+            room = get_object_or_404(Room, id=room_id)
+            conflicting_bookings = Booking.check_room_availability(room, check_in_date, check_out_date)
+            
+            if conflicting_bookings:
+                conflicts = []
+                for booking in conflicting_bookings:
+                    conflicts.append({
+                        'guest_name': booking.guest_name,
+                        'check_in': booking.check_in_date.strftime('%Y-%m-%d'),
+                        'check_out': booking.check_out_date.strftime('%Y-%m-%d'),
+                        'status': booking.get_status_display()
+                    })
+                
+                return JsonResponse({
+                    'success': False,
+                    'available': False,
+                    'conflicts': conflicts,
+                    'room_number': room.room_number
+                })
+            
+            return JsonResponse({
+                'success': True,
+                'available': True,
+                'room_number': room.room_number
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 @login_required
 @user_passes_test(is_admin_or_super)
